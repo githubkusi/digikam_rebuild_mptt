@@ -1,6 +1,7 @@
 import MySQLdb as mdb
 import sys
 import networkx as nx
+import argparse
 
 
 class ModifiedPreorderTraversalTree:
@@ -25,12 +26,12 @@ class ModifiedPreorderTraversalTree:
         return self.left, self.right
 
 
-def get_connection_and_cursor():
+def get_connection_and_cursor(params):
     con = mdb.connect(
-        host='localhost',
-        user='dkuser',
-        passwd='dkpasswd',
-        db='digikam_devel_core')
+        host=params.host,
+        user=params.user,
+        passwd=params.password,
+        db=params.database)
 
     cursor = con.cursor()
     return con, cursor
@@ -62,8 +63,37 @@ def build_modified_preorder_traversal_tree(G):
     return mptt.left, mptt.right
 
 
+class ParamsDebug:
+    def __init__(self):
+        self.host = 'localhost'
+        self.user = 'dkuser'
+        self.password = 'dkpasswd'
+        self.database = 'digikam_devel_core'
+
+
+class Params:
+    def __init__(self):
+        [self.host, self.user, self.password, self.database] = [None, None, None, None]
+        self.parse_args()
+
+    def parse_args(self):
+        parser = argparse.ArgumentParser(description='Rebuild Digikam MYSQL Modified Preorder Traversal Tree')
+        parser.add_argument('--host', default='localhost')
+        parser.add_argument('-u', '--user', required=True)
+        parser.add_argument('-p', '--password', required=True)
+        parser.add_argument('-d', '--database', required=True)
+        args = parser.parse_args()
+
+        self.host = args.host
+        self.user = args.user
+        self.password = args.password
+        self.database = args.database
+
+
 def main():
-    connection, cursor = get_connection_and_cursor()
+    params = ParamsDebug()
+
+    connection, cursor = get_connection_and_cursor(params)
     data = get_graph(cursor)
     graph = build_graph(data)
     # graph = build_graph_debug()
