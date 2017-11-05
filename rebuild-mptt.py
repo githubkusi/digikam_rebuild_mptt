@@ -1,5 +1,6 @@
+#!/usr/bin/python3
+
 import MySQLdb as mdb
-import sys
 import networkx as nx
 import argparse
 
@@ -91,7 +92,7 @@ class Params:
 
 
 def main():
-    params = ParamsDebug()
+    params = Params()
 
     connection, cursor = get_connection_and_cursor(params)
     data = get_graph(cursor)
